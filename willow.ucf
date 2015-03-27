@@ -1,0 +1,472 @@
+
+# ============================================================================
+#   Willow
+# ============================================================================
+
+# ==== Clock inputs (CLK) ====
+# Part: CB3LV-3I-50M0000 (3.3v, 50ppm)
+# 50ps peak to peak input jitter:
+# http://www.ctscorp.com/components/Datasheets/008-0256-0.pdf
+# Pin is IO_L30N_GCLK0_USERCCLK_2 
+NET "clock_50mhz" LOC = "AC14"      | CLOCK_DEDICATED_ROUTE = FALSE;
+NET "clock_50mhz" TNM_NET = "clock_50mhz";
+TIMESPEC "TS_clock_50mhz" = PERIOD "clock_50mhz" 20.0 ns HIGH 50% INPUT_JITTER 50.0ps;
+NET "clock_50mhz" IOSTANDARD = LVCMOS33;
+
+# Differential SATA clock
+# Part: ????
+# Sets up the differential clock to be the differential external 150 MHz clock
+NET "sata_clk" TNM_NET = "sata_clk_grp";
+TIMESPEC TS_sata_clock = PERIOD "sata_clk_grp" 6.666 ns HIGH 50%;
+
+# Cross-domain timing from 44MHz to 125MHz can be several clock cycles
+NET "clock_44mhz" TNM_NET = "clock_44mhz";
+NET "clock_125mhz" TNM_NET = "clock_125mhz";
+TIMESPEC "TS_44mhz_to_125mhz" = FROM clock_44mhz TO clock_125mhz 20.0 ns DATAPATHONLY;
+
+# Cross-domain timing from 150MHz to 44MHz to be a full 44MHz cycle
+TIMESPEC "TS_150mhz_to_44mhz" = FROM sata_clk_grp TO clock_44mhz 20.0 ns DATAPATHONLY;
+
+# TODO: does the below actually exist with the latest WiredLeaf hardware?
+# 32khz external clock (commented out to squelch synth warnings)
+# Part: Abracon ASFLK-32.768KHZ-LJT (3.3v)
+#NET "clk_32khz" LOC = "AD14";
+#NET "clk_32khz" PERIOD = 31.24ms HIGH 50% ;   # 32 KHz
+
+# ==== Active low reset input (RST) ====
+NET "n_reset_button"   LOC = "AF4" | IOSTANDARD = LVCMOS33 ; # BUTTON0
+
+# ==== LEDs ====
+NET "n_led<0>" LOC = "W20"       | IOSTANDARD = LVCMOS33 ;
+NET "n_led<1>" LOC = "R9"        | IOSTANDARD = LVCMOS33 ;
+NET "n_led<2>" LOC = "T9"        | IOSTANDARD = LVCMOS33 ;
+NET "n_led<3>" LOC = "U9"        | IOSTANDARD = LVCMOS33 ;
+NET "n_led<4>" LOC = "AB14"      | IOSTANDARD = LVCMOS33 ;
+NET "n_led<5>" LOC = "AB15"      | IOSTANDARD = LVCMOS33 ;
+
+# ==== USB FTDI signals ====
+# "uart_rx" is "usb_d<0>"; "uart_tx" is "usb_d<1>"
+NET "usb_d<0>" LOC = "AA22"     | IOSTANDARD = LVCMOS33 ;
+NET "usb_d<1>" LOC = "AB22"     | IOSTANDARD = LVCMOS33 ;
+#NET "usb_d<2>" LOC = "AC22"     | IOSTANDARD = LVCMOS33 ;
+#NET "usb_d<3>" LOC = "Y20"      | IOSTANDARD = LVCMOS33 ;
+#NET "usb_d<4>" LOC = "W19"      | IOSTANDARD = LVCMOS33 ;
+#NET "usb_d<5>" LOC = "W18"      | IOSTANDARD = LVCMOS33 ;
+#NET "usb_d<6>" LOC = "W17"      | IOSTANDARD = LVCMOS33 ;
+#NET "usb_d<7>" LOC = "Y17"      | IOSTANDARD = LVCMOS33 ;
+#NET "usb_n_rxf" LOC = "AF22"    | IOSTANDARD = LVCMOS33 ;
+#NET "usb_n_txe" LOC = "Y21"     | IOSTANDARD = LVCMOS33 ;
+#NET "usb_n_rd" LOC = "AB21"     | IOSTANDARD = LVCMOS33 ;
+#NET "usb_n_wr" LOC = "AA21"     | IOSTANDARD = LVCMOS33 ;
+#NET "usb_siwua" LOC = "AF15"    | IOSTANDARD = LVCMOS33 ;
+#NET "usb_clkout" LOC = "AE15"   | IOSTANDARD = LVCMOS33 ;
+#NET "usb_n_oe" LOC = "AF14"     | IOSTANDARD = LVCMOS33 ;
+#NET "usb_extra" LOC = "AE13"    | IOSTANDARD = LVCMOS33 ;
+
+# ==== Buttons ====
+NET "n_button<0>" LOC = "Y12"  | IOSTANDARD = LVCMOS33 ;
+NET "n_button<1>" LOC = "AA12" | IOSTANDARD = LVCMOS33 ;
+NET "n_button<2>" LOC = "AA6"  | IOSTANDARD = LVCMOS33 ;
+NET "n_button<3>" LOC = "V7"   | IOSTANDARD = LVCMOS33 ;
+
+# ==== Digital Expansion Headers ====
+NET "ext<0>" LOC = "AD4"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "ext<1>" LOC = "AC5"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "ext<2>" LOC = "AF6"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "ext<3>" LOC = "AD5"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "ext<4>" LOC = "AD6"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "ext<5>" LOC = "AA7"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "ext<6>" LOC = "AA9"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "ext<7>" LOC = "AB9"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "ext<8>" LOC = "W7"        | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "ext<9>" LOC = "AB11"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "ext<10>" LOC = "V10"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "ext<11>" LOC = "Y13"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "ext<12>" LOC = "V11"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "ext<13>" LOC = "W14"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "ext<14>" LOC = "V16"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "ext<15>" LOC = "AA17"     | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+
+# ==== MCU ====
+#NET "mcu_uart_tx" LOC = "G13"  | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+#NET "mcu_uart_rx" LOC = "J12"  | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# DEBUG
+#NET "mcu_ex<0>" LOC = "K12"    | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# DEBUG
+#NET "mcu_ex<1>" LOC = "G11"    | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "mcu_sclk" LOC = "H9"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "mcu_n_cs" LOC = "K9"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "mcu_mosi" LOC = "H12"     | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "mcu_miso" LOC = "J11"     | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+
+# ==== Timing Synchronization ====
+# NB: these signals share a port with the gige signals, which constrains their
+# type.
+NET "sync_slave_n" LOC = "AC24"     | IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE ; # AC24 is L74N
+NET "sync_slave_p" LOC = "AC23"     | IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE ; # AC23 is L74P
+NET "sync_master_n" LOC = "U22"      ; # U22 is L53N
+NET "sync_master_p" LOC = "U21"      ; # U21 is L53P 
+#NET "sync_master_n" LOC = "U22"      | IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE ; # U22 is L53N
+#NET "sync_master_p" LOC = "U21"      | IOSTANDARD = LVDS_25 | DIFF_TERM = TRUE ; # U21 is L53P 
+
+# ==== SATA ====
+## Both SATA GTPs are on the GTPA1_DUAL_X0Y0
+NET "sata_clk_p" LOC = "AE11"   ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+NET "sata_clk_n" LOC = "AF11"   ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+#NET "sata1_tx_p" LOC = "AE7"    ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+#NET "sata1_tx_n" LOC = "AF7"    ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+#NET "sata1_rx_p" LOC = "AC8"    ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+#NET "sata1_rx_n" LOC = "AD8"    ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+#NET "sata2_tx_p" LOC = "AE9"    ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+#NET "sata2_tx_n" LOC = "AF9"    ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+#NET "sata2_rx_p" LOC = "AC10"   ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+#NET "sata2_rx_n" LOC = "AD10"   ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+
+# ==== Gigabit Ethernet ====
+# 05/28/2013
+# GigE PHY Serial interface GTP potential gotcha
+# Dave notes that if we ever want to use the serial (GTP) interface to the PHY
+# chip on the WiredLeaf board, we will need to instantiate the old SATA #3 GTP
+# transciever because that transciever is the master for the "tile" and has a
+# calibration resistor attached; the PHY transciever won't work unless the other
+# transciever is instantiated, even if it isn't attached to anything. We
+# currently have no plans to use the serial interface, but this is noted in case
+# we ever do, and should be included in final hardware delivery documentation.
+#
+#NET "eth_clk_p" LOC = "D15"        ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+#NET "eth_clk_n" LOC = "C15"        ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+NET "eth_mdc" LOC = "P17"          ; #| IOSTANDARD = LVDS_25 ;
+NET "eth_mdio" LOC = "R19"         ; #| IOSTANDARD = LVDS_25 ;
+NET "eth_n_phy_reset" LOC = "V20"  ; #| IOSTANDARD = LVDS_25 ;
+#NET "eth_n_int" LOC = "AE25"       ; #| IOSTANDARD = LVDS_25 ;
+## SGMII interface
+#NET "eth_sgmii_tx_p" LOC = "B18"   ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+#NET "eth_sgmii_tx_n" LOC = "A18"   ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+#NET "eth_sgmii_rx_p" LOC = "D17"   ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+#NET "eth_sgmii_rx_n" LOC = "C17"   ; #| DIFF_TERM = TRUE | IOSTANDARD = LVDS_25 ;
+## GMII Interface
+#NET "eth_gmii_rx_clk" LOC = "U24"  ; #| IOSTANDARD = LVDS_25 ;
+#NET "eth_gmii_rx_dv" LOC = "V26"   ; #| IOSTANDARD = LVDS_25 ;
+#NET "eth_gmii_rx_er" LOC = "W26"   ; #| IOSTANDARD = LVDS_25 ;
+#NET "eth_gmii_rxd<0>" LOC = "U25"  ; #| IOSTANDARD = LVDS_25 ;
+#NET "eth_gmii_rxd<1>" LOC = "U26"  ; #| IOSTANDARD = LVDS_25 ;
+#NET "eth_gmii_rxd<2>" LOC = "AA24" ; #| IOSTANDARD = LVDS_25 ;
+#NET "eth_gmii_rxd<3>" LOC = "V21"  ; #| IOSTANDARD = LVDS_25 ;
+#NET "eth_gmii_rxd<4>" LOC = "U23"  ; #| IOSTANDARD = LVDS_25 ;
+#NET "eth_gmii_rxd<5>" LOC = "R23"  ; #| IOSTANDARD = LVDS_25 ;
+#NET "eth_gmii_rxd<6>" LOC = "R25"  ; #| IOSTANDARD = LVDS_25 ;
+#NET "eth_gmii_rxd<7>" LOC = "R24"  ; #| IOSTANDARD = LVDS_25 ;
+#NET "eth_gmii_crs" LOC = "T26"     ; #| IOSTANDARD = LVDS_25 ;
+#NET "eth_gmii_col" LOC = "R26"     ; #| IOSTANDARD = LVDS_25 ;
+NET "eth_gmii_gtx_clk" LOC = "W24" ; #| IOSTANDARD = LVDS_25 ;
+#NET "eth_gmii_tx_clk" LOC = "V23"  ; #| IOSTANDARD = LVDS_25 ;
+NET "eth_gmii_tx_en" LOC = "Y26"   ; #| IOSTANDARD = LVDS_25 ;
+#NET "eth_gmii_tx_er" LOC = "W25"   ; #| IOSTANDARD = LVDS_25 ;
+NET "eth_gmii_txd<0>" LOC = "AA25" ; #| IOSTANDARD = LVDS_25 ;
+NET "eth_gmii_txd<1>" LOC = "AA26" ; #| IOSTANDARD = LVDS_25 ;
+NET "eth_gmii_txd<2>" LOC = "AB24" ; #| IOSTANDARD = LVDS_25 ;
+NET "eth_gmii_txd<3>" LOC = "AB26" ; #| IOSTANDARD = LVDS_25 ;
+NET "eth_gmii_txd<4>" LOC = "AC26" ; #| IOSTANDARD = LVDS_25 ;
+NET "eth_gmii_txd<5>" LOC = "AC25" ; #| IOSTANDARD = LVDS_25 ;
+NET "eth_gmii_txd<6>" LOC = "AD26" ; #| IOSTANDARD = LVDS_25 ;
+NET "eth_gmii_txd<7>" LOC = "AE26" ; #| IOSTANDARD = LVDS_25 ;
+
+# ==== HSMC Connector (Digital Headstage SPI signals) ====
+NET "hsmc<1>" LOC = "AE2"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<2>" LOC = "AD3"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<3>" LOC = "AE1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<4>" LOC = "AC4"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<5>" LOC = "AD1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<6>" LOC = "AC3"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<7>" LOC = "AC2"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<8>" LOC = "AB5"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<9>" LOC = "AC1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<10>" LOC = "AB3"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<11>" LOC = "AB1"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<12>" LOC = "AA3"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<13>" LOC = "AA2"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<14>" LOC = "AA4"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<15>" LOC = "AA1"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<16>" LOC = "Y3"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<17>" LOC = "Y1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<18>" LOC = "V3"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<19>" LOC = "W2"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<20>" LOC = "W5"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<21>" LOC = "W1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<22>" LOC = "U3"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<23>" LOC = "V1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<24>" LOC = "U4"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<25>" LOC = "U2"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<26>" LOC = "T4"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<27>" LOC = "U1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<28>" LOC = "V5"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<29>" LOC = "Y5"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<30>" LOC = "AB4"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<31>" LOC = "V6"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<32>" LOC = "Y6"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<39>" LOC = "T1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<40>" LOC = "T3"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<41>" LOC = "R1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<42>" LOC = "U8"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<43>" LOC = "R2"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<44>" LOC = "U5"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<47>" LOC = "P1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<48>" LOC = "R3"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<49>" LOC = "N1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<50>" LOC = "P3"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<53>" LOC = "N2"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<54>" LOC = "N3"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<55>" LOC = "M1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<56>" LOC = "P8"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<59>" LOC = "L1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<60>" LOC = "M3"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<61>" LOC = "L2"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<62>" LOC = "N4"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<65>" LOC = "K1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<66>" LOC = "L3"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<67>" LOC = "J1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<68>" LOC = "R5"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<71>" LOC = "J2"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<72>" LOC = "R4"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<73>" LOC = "H1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<74>" LOC = "T8"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<77>" LOC = "G1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<78>" LOC = "N5"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<79>" LOC = "G2"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<80>" LOC = "M4"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<83>" LOC = "F1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<84>" LOC = "L4"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<85>" LOC = "E1"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<86>" LOC = "K3"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<90>" LOC = "K5"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<92>" LOC = "J3"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<95>" LOC = "R7"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<96>" LOC = "V4"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<97>" LOC = "R6"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<98>" LOC = "W3"       | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<101>" LOC = "C1"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<102>" LOC = "P6"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<103>" LOC = "C2"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<104>" LOC = "N6"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<107>" LOC = "B1"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<108>" LOC = "N7"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<109>" LOC = "A2"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<110>" LOC = "L7"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<113>" LOC = "B3"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<114>" LOC = "G3"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<115>" LOC = "A3"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<116>" LOC = "G9"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<119>" LOC = "B4"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<120>" LOC = "E3"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<121>" LOC = "A4"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<122>" LOC = "B2"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<125>" LOC = "B5"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<126>" LOC = "H6"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<127>" LOC = "A5"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<128>" LOC = "G7"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<131>" LOC = "F3"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<132>" LOC = "G8"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<133>" LOC = "F6"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<134>" LOC = "F7"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<137>" LOC = "D3"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<138>" LOC = "M6"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<139>" LOC = "C3"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<140>" LOC = "L6"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<143>" LOC = "F5"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<144>" LOC = "K6"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<145>" LOC = "E6"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<146>" LOC = "G6"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<149>" LOC = "E4"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<150>" LOC = "H3"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<151>" LOC = "E5"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<152>" LOC = "G4"      | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+# blank
+NET "hsmc<155>" LOC = "A13"     | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<156>" LOC = "D13"     | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<157>" LOC = "C13"     | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+NET "hsmc<158>" LOC = "E13"     | IOSTANDARD = LVCMOS33 | SLEW = FAST ;
+
+# ==== RAM (DDR2) ====
+# TODO:
+
+# ==== MUX signals ====
+# TODO: remove this?
+# TODO check IOSTANDARD
+#NET "mux_step_0" LOC = "L4"     | IOSTANDARD = LVCMOS33 ; 
+#NET "mux_step_1" LOC = "B2"     | IOSTANDARD = LVCMOS33 ; 
+
+################## Complicated/Messy SATA SMA/FMC Stuff #####################
+
+# GTP DECLARATION
+# Use the X0Y0 GTP tile for main SATA operation
+INST "central_core_i0/sata_core_i0/sata_top_inst/sata_control_inst/sata_core_wrap_hst_app/host_wrap/SINGLE_GTP_CHANNEL_1_INST.s6_gtp_i/tile0_s6_gtp_i/gtpa1_dual_i" LOC = GTPA1_DUAL_X0Y0;
+
+# These constraints are for the core clock signals when two transceiver dual are used 
+# Separable Architectures
+# Defines core clocks to be 300MHz(with 3.333ns Period) or 150MHz(with 6.666ns Period)
+# with 50% duty cycles
+NET "*host_wrap/gtpclkout_rx_to_dcm" TNM_NET = "host_wrap/gtpclkout_rx";
+TIMESPEC TS_host_sata_core_wrap_gtpclkout_rx = PERIOD "host_wrap/gtpclkout_rx" 3.333 ns HIGH 50 % PRIORITY 3;
+NET "*host_wrap/gtpclkout_tx_to_dcm" TNM_NET = "host_wrap/gtpclkout_tx";
+TIMESPEC TS_host_sata_core_wrap_gtpclkout_tx = PERIOD "host_wrap/gtpclkout_tx" 6.666 ns HIGH 50 % PRIORITY 3;
+#NET "*host_wrap/pll_fb_rx" TNM_NET = "host_wrap/pll_fb_rx";
+#TIMESPEC TS_host_sata_core_wrap_pll_fb_rx = PERIOD "host_wrap/pll_fb_rx" 3.333 ns HIGH 50 %;
+NET "*host_wrap/pll_fb_rx_in" TNM_NET = "host_wrap/pll_fb_rx_in";
+TIMESPEC TS_host_sata_core_wrap_pll_fb_rx_in = PERIOD "host_wrap/pll_fb_rx_in" 3.333 ns HIGH 50 %;
+NET "*host_wrap/ClockByte_rx" TNM_NET = "host_wrap/ClockByte_rx";
+TIMESPEC TS_host_sata_core_wrap_ClockByte_rx = PERIOD "host_wrap/ClockByte_rx" TS_host_sata_core_wrap_gtpclkout_rx  PHASE + 0 ns HIGH 50 % PRIORITY 2;
+NET "*host_wrap/ClockDword_rx" TNM_NET = "host_wrap/ClockDword_rx";
+TIMESPEC TS_host_sata_core_wrap_ClockDword_rx = PERIOD "host_wrap/ClockDword_rx" TS_host_sata_core_wrap_ClockByte_rx * 4 PHASE + 0 ns HIGH 50 % PRIORITY 2;
+NET "*host_wrap/refclkout_bufg" TNM = "refclkout_bufg_hst";
+TIMESPEC TS_RefClkOutBufgHst = PERIOD "refclkout_bufg_hst" TS_host_sata_core_wrap_gtpclkout_tx  PHASE + 0 ns HIGH 50 % PRIORITY 2;
+
+NET "*host_wrap/ClockByte" TNM_NET = "ClockByteHst0";
+TIMESPEC TS_ClockByteHst0 = PERIOD "ClockByteHst0" TS_host_sata_core_wrap_gtpclkout_tx / 2 PHASE + 0 ns HIGH 50 % PRIORITY 2;
+
+# ?????
+#INST "central_core_i0/sata_core/sata/sata_core_wrap_hst_app" AREA_GROUP = "pblock_st_cr_wrp_hst_ap";
+#AREA_GROUP "pblock_st_cr_wrp_hst_ap" RANGE=SLICE_X0Y88:SLICE_X29Y125;
+#AREA_GROUP "pblock_st_cr_wrp_hst_ap" RANGE=RAMB16_X0Y60:RAMB16_X1Y44;
+#AREA_GROUP "pblock_st_cr_wrp_hst_ap" RANGE=RAMB8_X0Y61:RAMB8_X1Y44;
+
+# This constrains the time delay between [xilinx_reconfig_controller_i/gen_value?] to
+# [host_wrap/ClockByte_Gen1?] to 13 nanoseconds.
+# TODO: the xilinx_reconfig_controller_i/gen_value* pattern doesn't seem to
+# match any actual nets (as searched for in fpga_editor). It's unclear what
+# xilinx_reconfig_controller_i is (a Xilinx IP Core for managing GTP
+# reconfiguration?). It does contain some nets like "in_speed_neg_dly_cnt[3:0],
+# c_state_FSM_FFd2, etc.
+NET "*host_wrap/xilinx_reconfig_controller_i/gen_value*" TNM_NET = FFS "gen_value";
+NET "*host_wrap/ClockByte_Gen1" TNM_NET = "ClockByte_Gen1";
+TIMESPEC TS_refclk_to_Gen1 = FROM "gen_value" TO "ClockByte_Gen1" 13 ns DATAPATHONLY PRIORITY 1;
+
+# The following "TPTHRU" constraints force pattern-matched groups of nets to be
+# considered as routed through the given timing group.
+# None of LinkHst, KCharHst, Data32Hst, RxCharHst, RxDataHst etc seem to be
+# valid timing groups, unless specified in encrypted files. Regardless, these
+# don't cause build warnings, so they are being left "as is", passed through
+# from Intelliprop.
+NET "*host_wrap/SATA_CORE_OOB/coreInstance[0].SATA_CORE/i_link_top*" TPTHRU = "LinkHst";
+NET "*host_wrap/SATA_CORE_OOB/coreInstance[0].SATA_CORE/i_phy_top/i_phy_in/u_32to32_unit/KChar*" TPTHRU = "KCharHst";
+NET "*host_wrap/SATA_CORE_OOB/coreInstance[0].SATA_CORE/i_phy_top/i_phy_in/u_32to32_unit/Data32*" TPTHRU = "Data32Hst";
+NET "*host_wrap/RxChar*" TPTHRU = "RxCharHst";
+NET "*host_wrap/RxData*" TPTHRU = "RxDataHst";
+NET "*host_wrap/SATA_CORE_OOB/coreInstance[0].SATA_CORE/i_phy_top/i_phy_in/u_32to32_unit/KChar*" TPTHRU = "KCharDev";
+NET "*host_wrap/SATA_CORE_OOB/coreInstance[0].SATA_CORE/i_phy_top/i_phy_in/u_32to32_unit/Data32*" TPTHRU = "Data32Dev";
+NET "*host_wrap/RxChar*" TPTHRU = "RxCharDev";
+NET "*host_wrap/RxData*" TPTHRU = "RxDataDev";
+
+# This contrains timing for the DAQ-SATA FIFO between the 44.1MHz and "SATA
+# Clock Dword" (aka clkout, aka daq_fifo_clock) domains. Dword clock is at
+# 37.5MHz for SATA I, double (75MHz) that for SATA II.
+NET "central_core_i0/daq2sata_fifo_clock" TNM_NET = "ClockDword";
+TIMESPEC "TS_sata_dword_to_44mhz" = FROM ClockDword TO clock_44mhz 26.66 ns DATAPATHONLY; # for SATA I
+#TIMESPEC "TS_sata_dword_to_44mhz" = FROM ClockDword TO clock_44mhz 13.33 ns; # for SATA II
+
+
+################## DDR3 Stuff #####################
+CONFIG VCCAUX=3.3; # Valid values are 2.5 and 3.3
+CONFIG MCB_PERFORMANCE= EXTENDED;
+
+NET "ddr3_fifo_wrapper_i0/memc_mcb_drp_clk" TNM_NET = "clock_333mhz";
+TIMESPEC "TS_333mhz_to_44mhz" = FROM clock_333mhz TO clock_44mhz 20.0 ns DATAPATHONLY;
+TIMESPEC "TS_44mhz_to_333mhz" = FROM clock_44mhz TO clock_333mhz 20.0 ns DATAPATHONLY;
+TIMESPEC "TS_333mhz_to_sata_dword" = FROM clock_333mhz TO ClockDword 20.0 ns DATAPATHONLY;
+TIMESPEC "TS_sata_dword_to_333mhz" = FROM ClockDword TO clock_333mhz 20.0 ns DATAPATHONLY;
+
+NET "ddr3_fifo_wrapper_i0/ddr3_fifo_i/mem_wrapper/mcb_ui_top_inst/mcb_raw_wrapper_inst/selfrefresh_mcb_mode" TIG;
+
+#INST "ddr3_fifo_wrapper_i/ddr3_fifo_i/mem_wrapper/mcb_ui_top_inst/mcb_raw_wrapper_inst/gen_term_calib.mcb_soft_calibration_top_inst/mcb_soft_calibration_inst/DONE_SOFTANDHARD_CAL*" TIG;
+
+NET "ddr3_fifo_wrapper_i0/memc_pll_lock" TIG; # inside of inf
+
+######## The above were pattern matched against the Xilinx provided constraints #######
+#NET "dfifo/mem_wrapper/mcb_ui_top_inst/mcb_raw_wrapper_inst/selfrefresh_mcb_mode" TIG;
+#NET "memc_pll_lock" TIG;
+#INST "dfifo/mem_wrapper/mcb_ui_top_inst/mcb_raw_wrapper_inst/gen_term_calib.mcb_soft_calibration_top_inst/mcb_soft_calibration_inst/DONE_SOFTANDHARD_CAL*" TIG;
+
+#Please uncomment the below TIG if used in a design which enables self-refresh mode
+#NET "memc?_wrapper_inst/mcb_ui_top_inst/mcb_raw_wrapper_inst/gen_term_calib.mcb_soft_calibration_top_inst/mcb_soft_calibration_inst/SELFREFRESH_MCB_REQ" TIG;
+###################################
+
+
+NET "mcb5_dram_dq[*]"          IN_TERM = NONE;
+NET "mcb5_dram_dqs"            IN_TERM = NONE;
+NET "mcb5_dram_dqs_n"          IN_TERM = NONE;
+
+NET  "mcb5_dram_dq[*]"         IOSTANDARD = SSTL15_II  | OUT_TERM = UNTUNED_50;
+NET  "mcb5_dram_a[*]"          IOSTANDARD = SSTL15_II  | OUT_TERM = UNTUNED_50;
+NET  "mcb5_dram_ba[*]"         IOSTANDARD = SSTL15_II  | OUT_TERM = UNTUNED_50;
+NET  "mcb5_dram_dqs"           IOSTANDARD = DIFF_SSTL15_II  | OUT_TERM = UNTUNED_50;
+NET  "mcb5_dram_dqs_n"         IOSTANDARD = DIFF_SSTL15_II  | OUT_TERM = UNTUNED_50;
+NET  "mcb5_dram_ck"            IOSTANDARD = DIFF_SSTL15_II  | OUT_TERM = UNTUNED_50;
+NET  "mcb5_dram_ck_n"          IOSTANDARD = DIFF_SSTL15_II  | OUT_TERM = UNTUNED_50;
+NET  "mcb5_dram_cke"           IOSTANDARD = SSTL15_II  | OUT_TERM = UNTUNED_50;
+NET  "mcb5_dram_ras_n"         IOSTANDARD = SSTL15_II  | OUT_TERM = UNTUNED_50;
+NET  "mcb5_dram_cas_n"         IOSTANDARD = SSTL15_II  | OUT_TERM = UNTUNED_50;
+NET  "mcb5_dram_we_n"          IOSTANDARD = SSTL15_II  | OUT_TERM = UNTUNED_50;
+NET  "mcb5_dram_odt"           IOSTANDARD = SSTL15_II  | OUT_TERM = UNTUNED_50;
+NET  "mcb5_dram_reset_n"       IOSTANDARD = LVCMOS15  ;
+NET  "mcb5_dram_dm"            IOSTANDARD = SSTL15_II  | OUT_TERM = UNTUNED_50;
+NET  "mcb5_rzq"                IOSTANDARD = SSTL15_II  | OUT_TERM = UNTUNED_50;
+NET  "mcb5_zio"                IOSTANDARD = SSTL15_II  | OUT_TERM = UNTUNED_50;
+
+NET  "mcb5_dram_a[0]"                            LOC = "C25" ;
+NET  "mcb5_dram_a[10]"                           LOC = "F22" ;
+NET  "mcb5_dram_a[11]"                           LOC = "K19" ;
+NET  "mcb5_dram_a[12]"                           LOC = "C24" ;
+NET  "mcb5_dram_a[13]"                           LOC = "B24" ;
+NET  "mcb5_dram_a[1]"                            LOC = "C26" ;
+NET  "mcb5_dram_a[2]"                            LOC = "E24" ;
+NET  "mcb5_dram_a[3]"                            LOC = "K21" ;
+NET  "mcb5_dram_a[4]"                            LOC = "G23" ;
+NET  "mcb5_dram_a[5]"                            LOC = "M18" ;
+NET  "mcb5_dram_a[6]"                            LOC = "M19" ;
+NET  "mcb5_dram_a[7]"                            LOC = "E23" ;
+NET  "mcb5_dram_a[8]"                            LOC = "H21" ;
+NET  "mcb5_dram_a[9]"                            LOC = "H22" ;
+NET  "mcb5_dram_ba[0]"                           LOC = "L19" ;
+NET  "mcb5_dram_ba[1]"                           LOC = "K20" ;
+NET  "mcb5_dram_ba[2]"                           LOC = "J22" ;
+NET  "mcb5_dram_cas_n"                           LOC = "G24" ;
+NET  "mcb5_dram_ck"                              LOC = "B25" ;
+NET  "mcb5_dram_ck_n"                            LOC = "B26" ;
+NET  "mcb5_dram_cke"                             LOC = "D23" ;
+NET  "mcb5_dram_dm"                              LOC = "J24" ;
+NET  "mcb5_dram_dq[0]"                           LOC = "G25" ;
+NET  "mcb5_dram_dq[1]"                           LOC = "G26" ;
+NET  "mcb5_dram_dq[2]"                           LOC = "H24" ;
+NET  "mcb5_dram_dq[3]"                           LOC = "H26" ;
+NET  "mcb5_dram_dq[4]"                           LOC = "E25" ;
+NET  "mcb5_dram_dq[5]"                           LOC = "E26" ;
+NET  "mcb5_dram_dq[6]"                           LOC = "D24" ;
+NET  "mcb5_dram_dq[7]"                           LOC = "D26" ;
+NET  "mcb5_dram_dqs"                             LOC = "F24" ;
+NET  "mcb5_dram_dqs_n"                           LOC = "F26" ;
+NET  "mcb5_dram_odt"                             LOC = "K22" ;
+NET  "mcb5_dram_ras_n"                           LOC = "F23" ;
+NET  "mcb5_dram_reset_n"                         LOC = "K18" ;
+NET  "mcb5_dram_we_n"                            LOC = "J20" ;
+
+NET  "mcb5_rzq"                                  LOC = "H20" ;
+NET  "mcb5_zio"                                  LOC = "M21" ;
