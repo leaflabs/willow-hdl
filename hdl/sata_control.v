@@ -371,6 +371,7 @@ module sata_control #(
    //---------------------------------------
    // Sata host wrapper
    //---------------------------------------
+/* -----\/----- EXCLUDED -----\/-----
    (* keep = "true" *) sata_core_wrap_hst_app #(
                                                 .SERDES_TYPE(SERDES_TYPE),
                                                 .NUM_REF_CLOCKS(NUM_REF_CLOCKS),
@@ -431,7 +432,7 @@ module sata_control #(
                            .FifoReadData({2'b0,daq_fifo_data}),          //input[33:0] send data out to HD,
                            //                          .FifoReadData({2'b0,fifo_in_din}),          //input[33:0] send data out to HD,
                            .FifoWriteData(udp_fifo_din),         //outpu[33:0]
-                           /* -----\/----- EXCLUDED -----\/-----
+                           /-* -----\/----- EXCLUDED -----\/-----
 
                             .FifoReadEn(FIFO_TX_RD),                 //output
                             .FifoWriteEn(FIFO_RX_WR),                //output
@@ -440,7 +441,7 @@ module sata_control #(
                             .FifoEmpty(1'b0),            //input
                             .FifoReadData(34'b0),//DATAFRM_TX_FIFO),          //input[33:0] send data out to HD,
                             .FifoWriteData(),         //outpu[33:0]
-                            -----/\----- EXCLUDED -----/\----- */
+                            -----/\----- EXCLUDED -----/\----- *-/
 
                            //RxRegisters
                            .RxHeaderReg0(notuse0),                  //do not use
@@ -506,6 +507,7 @@ module sata_control #(
 
                            .speeds_allowed(speeds_allowed)
                            );
+ -----/\----- EXCLUDED -----/\----- */
 
    assign device_ready = DevReady;
    assign sata_ready = sata_io_ready;
