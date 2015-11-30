@@ -12,7 +12,7 @@
  * Register map (module 0x03):
  *
  *      0x00    R/W     DAQ Module Error Flags
- *      0x01    R/W     Unused (3 B) | DAQ Module Acquire Enable (1 B)
+ *      0x01    R/W     Unused (2 B) | Master/slave setting (1 B) | DAQ Module Acquire Enable (1 B)
  *      0x02    R/W     Desired Start Board Sample Number (4 B)
  *      0x03    R/O     Current Board Sample Number (4 B)
  *      0x04    R/O     Chip alive bitmask (4 B)
@@ -114,6 +114,7 @@ module daq_core (
     parameter DEFAULT_SAMPLE_EXTRA = 0;
 
     reg acquire_en = 0;
+    reg is_master = 0;
     assign acquire_status = acquire_en;
     reg sata_en = 0;
     reg sata_align_start_en = 0;
@@ -138,8 +139,42 @@ module daq_core (
 
     wire [159:0] subsample_chip_indexes;     // 5bits x 32chips
     wire [159:0] subsample_channel_indexes;  // 5bits x 32channels
-    reg [4:0] sschipi [0:31] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};   // chip indexes
-    reg [4:0] sschani [0:31] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31};   // channel index
+    reg [4:0] sschipi [0:31];   // chip indexes
+    reg [4:0] sschani [0:31];   // channel index
+    initial begin
+        sschipi[ 0] = 5'd00;  sschani[ 0] = 5'd00;
+        sschipi[ 1] = 5'd00;  sschani[ 1] = 5'd01;
+        sschipi[ 2] = 5'd00;  sschani[ 2] = 5'd02;
+        sschipi[ 3] = 5'd00;  sschani[ 3] = 5'd03;
+        sschipi[ 4] = 5'd00;  sschani[ 4] = 5'd04;
+        sschipi[ 5] = 5'd00;  sschani[ 5] = 5'd05;
+        sschipi[ 6] = 5'd00;  sschani[ 6] = 5'd06;
+        sschipi[ 7] = 5'd00;  sschani[ 7] = 5'd07;
+        sschipi[ 8] = 5'd00;  sschani[ 8] = 5'd08;
+        sschipi[ 9] = 5'd00;  sschani[ 9] = 5'd09;
+        sschipi[10] = 5'd00;  sschani[10] = 5'd10;
+        sschipi[11] = 5'd00;  sschani[11] = 5'd11;
+        sschipi[12] = 5'd00;  sschani[12] = 5'd12;
+        sschipi[13] = 5'd00;  sschani[13] = 5'd13;
+        sschipi[14] = 5'd00;  sschani[14] = 5'd14;
+        sschipi[15] = 5'd00;  sschani[15] = 5'd15;
+        sschipi[16] = 5'd00;  sschani[16] = 5'd16;
+        sschipi[17] = 5'd00;  sschani[17] = 5'd17;
+        sschipi[18] = 5'd00;  sschani[18] = 5'd18;
+        sschipi[19] = 5'd00;  sschani[19] = 5'd19;
+        sschipi[20] = 5'd00;  sschani[20] = 5'd20;
+        sschipi[21] = 5'd00;  sschani[21] = 5'd21;
+        sschipi[22] = 5'd00;  sschani[22] = 5'd22;
+        sschipi[23] = 5'd00;  sschani[23] = 5'd23;
+        sschipi[24] = 5'd00;  sschani[24] = 5'd24;
+        sschipi[25] = 5'd00;  sschani[25] = 5'd25;
+        sschipi[26] = 5'd00;  sschani[26] = 5'd26;
+        sschipi[27] = 5'd00;  sschani[27] = 5'd27;
+        sschipi[28] = 5'd00;  sschani[28] = 5'd28;
+        sschipi[29] = 5'd00;  sschani[29] = 5'd29;
+        sschipi[30] = 5'd00;  sschani[30] = 5'd30;
+        sschipi[31] = 5'd00;  sschani[31] = 5'd31;
+    end
     genvar cntr;
     for (cntr = 0; cntr < 32; cntr = cntr + 1) begin : subsample_index_loop
         assign subsample_chip_indexes[(cntr*5)+4:(cntr*5)] = sschipi[cntr];
@@ -318,7 +353,6 @@ module daq_core (
             error_cfg <= 1'b0;
             udp_fifo_reset <= 1'b0;
             sngdaq_reset_bsi <= 1'b0;
-            reset_subsample_indexes;
             error_buf <= 4'd0;
             sample_extra_en <= DEFAULT_SAMPLE_EXTRA;
         end else begin
@@ -344,12 +378,13 @@ module daq_core (
                             error_cfg};             // 0
                     end
                 end
-                8'h01: begin    // Unused (3 B) | DAQ Module Acquire Enable (1 B)
+                8'h01: begin    // Unused (2 B) | Master/slave setting (1 B) | DAQ Module Acquire Enable (1 B)
                     if (cfg_mwrite_en) begin
                         acquire_en <= cfg_data_mwrite[0];
-                        cfg_data_mread <= {31'd0, cfg_data_mwrite[0]};
+                        is_master <= cfg_data_mwrite[8];
+                        cfg_data_mread <= {23'd0, cfg_data_mwrite[8], 7'd0, cfg_data_mwrite[0]};
                     end else begin
-                        cfg_data_mread <= {31'd0, acquire_en};
+                        cfg_data_mread <= {23'd0, is_master, 7'd0, acquire_en};
                     end
                 end
                 8'h02: begin    // Desired Start Board Sample Number (4 B)
@@ -499,47 +534,6 @@ module daq_core (
             end
         end
     end
-
-    initial begin
-        reset_subsample_indexes;
-    end
-
-    task reset_subsample_indexes;
-        begin
-        sschipi[ 0] <= 5'd00;  sschani[ 0] <= 5'd00;
-        sschipi[ 1] <= 5'd00;  sschani[ 1] <= 5'd01;
-        sschipi[ 2] <= 5'd00;  sschani[ 2] <= 5'd02;
-        sschipi[ 3] <= 5'd00;  sschani[ 3] <= 5'd03;
-        sschipi[ 4] <= 5'd00;  sschani[ 4] <= 5'd04;
-        sschipi[ 5] <= 5'd00;  sschani[ 5] <= 5'd05;
-        sschipi[ 6] <= 5'd00;  sschani[ 6] <= 5'd06;
-        sschipi[ 7] <= 5'd00;  sschani[ 7] <= 5'd07;
-        sschipi[ 8] <= 5'd00;  sschani[ 8] <= 5'd08;
-        sschipi[ 9] <= 5'd00;  sschani[ 9] <= 5'd09;
-        sschipi[10] <= 5'd00;  sschani[10] <= 5'd10;
-        sschipi[11] <= 5'd00;  sschani[11] <= 5'd11;
-        sschipi[12] <= 5'd00;  sschani[12] <= 5'd12;
-        sschipi[13] <= 5'd00;  sschani[13] <= 5'd13;
-        sschipi[14] <= 5'd00;  sschani[14] <= 5'd14;
-        sschipi[15] <= 5'd00;  sschani[15] <= 5'd15;
-        sschipi[16] <= 5'd00;  sschani[16] <= 5'd16;
-        sschipi[17] <= 5'd00;  sschani[17] <= 5'd17;
-        sschipi[18] <= 5'd00;  sschani[18] <= 5'd18;
-        sschipi[19] <= 5'd00;  sschani[19] <= 5'd19;
-        sschipi[20] <= 5'd00;  sschani[20] <= 5'd20;
-        sschipi[21] <= 5'd00;  sschani[21] <= 5'd21;
-        sschipi[22] <= 5'd00;  sschani[22] <= 5'd22;
-        sschipi[23] <= 5'd00;  sschani[23] <= 5'd23;
-        sschipi[24] <= 5'd00;  sschani[24] <= 5'd24;
-        sschipi[25] <= 5'd00;  sschani[25] <= 5'd25;
-        sschipi[26] <= 5'd00;  sschani[26] <= 5'd26;
-        sschipi[27] <= 5'd00;  sschani[27] <= 5'd27;
-        sschipi[28] <= 5'd00;  sschani[28] <= 5'd28;
-        sschipi[29] <= 5'd00;  sschani[29] <= 5'd29;
-        sschipi[30] <= 5'd00;  sschani[30] <= 5'd30;
-        sschipi[31] <= 5'd00;  sschani[31] <= 5'd31;
-        end
-    endtask
 
 endmodule
 
