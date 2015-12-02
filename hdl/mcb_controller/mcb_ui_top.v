@@ -721,6 +721,8 @@ begin : func_rr
   integer max_ports;
   integer num_ports;
   integer port_cnt;
+  integer w;
+  integer s;
 
   case (port_config)
     1: max_ports = 6;
@@ -751,8 +753,16 @@ begin : func_rr
     port_cnt = port_cnt +1;
   end
 
+  // Note: replaced a call to blso here so this could compile as a
+  // constant function; untested
 
-  rr = blso(rr, slot_num, num_ports);
+  w = num_ports*3;
+  s = (slot_num*3) % w;
+
+  for (i = 0; i < w; i = i + 1) begin
+    rr[i] = rr[(i+w-s)%w];
+  end
+
 end
 endfunction
 
