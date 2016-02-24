@@ -1,7 +1,7 @@
 import os
 import sys
 from array import array as Array
-from pyftdi.pyftdi.ftdi import Ftdi
+from pyftdi.ftdi import Ftdi
 
 
 
