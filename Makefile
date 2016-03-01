@@ -79,7 +79,7 @@ alltests := test/top_level_tb
 vgenerics += "INTERFACE_BOARD_VERSION=2"
 vgenerics += "NUM_CHIPS=32"
 vgenerics += "DUMMY_DAQ=0"
-vgenerics += "FORCE_ACQUISITION=1"
+vgenerics += "FORCE_ACQUISITION=0"
 vgenerics += "MOSI_ON_FALLING=1"
 vgenerics += "MOSI_ON_NEXT_RISING=1" # overrides MOSI_ON_FALLING
 vgenerics += "SIGNED_ADC_VALUES=0"

@@ -178,45 +178,20 @@ module rhd2000_driver (
               chip_sample_index <= chip_sample_index + 24'd1;
               case (chip_sample_index)
                 0: begin
-                   cmd <= {2'b11, 6'd40, 8'h00}; // READ(40)
+                   cmd <= {2'b11, 6'd63, 8'h00}; // READ(63) - Chip ID
                 end
                 3: begin
-                   if (reply[8:0] != 8'd73) begin
+                   if (reply[7:0] != 7'd1) begin
                       $display("FAIL: wrong ID");
-                      cmd <= {2'b01, 14'd0};  // DUMMY
-                      state <= STATE_WAIT;
+                      alive <= 0;
+                   end else begin
+                      alive <= 1;
                    end
-                   cmd <= {2'b11, 6'd41, 8'h00}; // READ(41)
-                end
-                6: begin
-                   if (reply[8:0] != 8'd78) begin
-                      $display("FAIL: wrong ID");
-                      state <= STATE_WAIT;
-                   end
-                   cmd <= {2'b11, 6'd42, 8'h00}; // READ(42)
-                end
-                9: begin
-                   if (reply[8:0] != 8'd84) begin
-                      $display("FAIL: wrong ID");
-                      state <= STATE_WAIT;
-                   end
-                   cmd <= {2'b11, 6'd43, 8'h00}; // READ(43)
-                end
-                12: begin
-                   if (reply[8:0] != 8'd65) begin
-                      $display("FAIL: wrong ID");
-                      state <= STATE_WAIT;
-                   end
-                   cmd <= {2'b11, 6'd44, 8'h00}; // READ(44)
-                end
-                15: begin
-                   if (reply[8:0] != 8'd78) begin
-                      $display("FAIL: wrong ID");
-                      state <= STATE_WAIT;
-                   end
-                   chip_sample_index <= 24'd0;
-                   alive <= 1'b1;  // TODO: move this to bottom of STATE_INIT?
                    state <= STATE_INIT;
+                   cmd <= {2'b01, 14'd0};  // DUMMY
+                end
+                default: begin
+                   cmd <= {2'b01, 14'd0};  // DUMMY
                 end
               endcase
            end
